@@ -6,7 +6,7 @@ CREATE TABLE Accounts (
     Created_Date DATE DEFAULT SYSDATE
 );
 
--- Table for transactions
+
 CREATE TABLE Transactions (
     Transaction_ID NUMBER PRIMARY KEY,
     From_Account_ID NUMBER,
@@ -56,28 +56,28 @@ CREATE OR REPLACE PROCEDURE Transfer_Funds(
     v_from_balance NUMBER;
     v_to_balance NUMBER;
 BEGIN
-    -- Step 1: Check source account balance
+  
     v_from_balance := Get_Balance(p_from_account_id);
 
     IF v_from_balance < p_amount THEN
         RAISE_APPLICATION_ERROR(-20002, 'Insufficient funds in source account.');
     END IF;
 
-    -- Step 2: Deduct amount from source account
+    
     UPDATE Accounts
     SET Balance = Balance - p_amount
     WHERE Account_ID = p_from_account_id;
 
-    -- Step 3: Add amount to destination account
+    
     UPDATE Accounts
     SET Balance = Balance + p_amount
     WHERE Account_ID = p_to_account_id;
 
-    -- Step 4: Log the transaction
+   
     INSERT INTO Transactions (Transaction_ID, From_Account_ID, To_Account_ID, Amount)
     VALUES ((SELECT NVL(MAX(Transaction_ID), 0) + 1 FROM Transactions), p_from_account_id, p_to_account_id, p_amount);
 
-    -- Step 5: Commit transaction
+    
     COMMIT;
 
     DBMS_OUTPUT.PUT_LINE('Funds transferred successfully.');
@@ -148,11 +148,11 @@ BEGIN
 END;
 /
 
--- View accounts
+
 SELECT * FROM Accounts;
 
--- View transactions
+
 SELECT * FROM Transactions;
 
--- View account audit log
+
 SELECT * FROM Account_Audit_Log;
